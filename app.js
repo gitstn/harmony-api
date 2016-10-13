@@ -367,10 +367,10 @@ app.get('/hubs/:hubSlug/devices', function(req, res){
   harmonyHubClient = harmonyHubClients[hubSlug]
 
   if (harmonyHubClient) {
-    var devices = [];
-    res.json({devices: cachedHarmonyDevices(hubSlug).map(function(device) {
-      return device.slug
-    })})
+    var devices = cachedHarmonyDevices(hubSlug).map(function(device) {
+      return {id:device.id, slug:device.slug, label:device.label}
+    })
+    res.json({devices: devices})
   }else{
     res.status(404).json({message: "Not Found"})
   }
@@ -382,7 +382,11 @@ app.get('/hubs/:hubSlug/devices/:deviceSlug/commands', function(req, res){
   device = deviceBySlugs(hubSlug, deviceSlug)
 
   if (device) {
-    res.json({commands: Object.keys(device.commands)})
+    commands =  Object.keys(device.commands).map(function(commandSlug){
+      cmd = device.commands[commandSlug]
+      return {name:cmd.name, slug:commandSlug, label:cmd.label}
+    })
+    res.json({commands: commands})
   }else{
     res.status(404).json({message: "Not Found"})
   }
